@@ -1,0 +1,5 @@
+DATABASE_URL="postgresql://purvi@localhost:5432/atrcar"
+AUTH0_DOMAIN="purvi-udacity.us.auth0.com"
+ALGORITHMS="['RS256']"
+API_AUDIENCE="atrcar_api"
+DATABASE_TEST_URL="postgresql/purvi@localhost:5432/atrcar_test"
