@@ -1,8 +1,8 @@
 import os
 import babel
 from babel.dates import format_date
+from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import (
     Column,
@@ -22,8 +22,8 @@ setup_db(app)
 '''
 
 def setup_db(app,database_path=database_path):
-    app.config['SQLALCHEMY_DATABASE_URL'] = database_path
-    app.config['SQLALCHEMY_TRACK_MODIFIACATION'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_path
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
 
@@ -36,8 +36,8 @@ class Model_Owner(db.Model):
     __tablename__ =  "model_owner"
 
     id = db.Column(db.Integer, primary_key=True)
-    model_id = db.Column(db.Integer, db.ForeignKey(models.id, ondelete="CASECADE"), nullable=False)
-    onwer_id = db.Column(db.Integer, db.ForeignKey(owners.id, ondelete="CASECADE"), nullable=False)
+    model_id = db.Column(db.Integer, db.ForeignKey('models.id', ondelete="CASCADE"), nullable=False)
+    onwer_id = db.Column(db.Integer, db.ForeignKey('owners.id', ondelete="CASCADE"), nullable=False)
 
     def __init__(self, model_id, owner_id):
         self.model_id = model_id
@@ -52,7 +52,7 @@ class Model_Owner(db.Model):
         db.session.commit()
 
 '''
-    Car_Model : class for table car model details
+Car_Model : class for table car model details
 '''
 
 class Car_Model(db.Model):
@@ -61,7 +61,7 @@ class Car_Model(db.Model):
     id = Column(Integer, primary_key = True)
     model_name = Column(String)
     launch_date = Column(Date)
-    modle_owners = db.relationship('Model_Owner', casecade="all,delete", backref="models", lazy=True)
+    modle_owners = db.relationship('Model_Owner', cascade="all,delete", backref="models", lazy=True)
 
     def __init__(self, model_name, launch_date):
         self.model_name =  model_name
@@ -77,9 +77,22 @@ class Car_Model(db.Model):
     
     def update(self):
         db.session.commit()
+    
+    def format(self):
+
+        # set release date in format
+        formatDate = "EEEE, dd MMMM YYYY"
+        format_launch_date = babel.dates.format_date(
+            self.launch_date, formatDate)
+
+        return {
+            'id': self.id,
+            'model_name': self.model_name,
+            'launch_date': format_launch_date
+        }
 
 '''
-    Car_Owner : class for table car owner's details
+ Car_Owner : class for table car owner's details
 '''
 
 class Car_Owner(db.Model):
@@ -88,7 +101,7 @@ class Car_Owner(db.Model):
     id = Column(Integer, primary_key=True)
     owner_name = Column(String)
     purchase_date = Column(Date)
-    modle_owners = db.relationship("Modle_Owner", casecade = "all,delete", lazy=True)
+    modle_owners = db.relationship("Modle_Owner", cascade = "all,delete", lazy=True)
 
     def __init__(self, owner_name, purchase_date):
         self.owner_name = owner_name
@@ -105,5 +118,15 @@ class Car_Owner(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def format(self):
+        owner_cars = db.session.query(Car_Model.modle_name).filter(
+            Model_Owner.onwer_id == self.id ,
+            Model_Owner.model_id == Car_Model.id).oder_by(Car_Model.id).all()
+        owner_car_names = [car.name for car in owner_cars]
 
-
+        return {
+            'id': self.id,
+            'owner_name': self.owner_name,
+            'purchase_date': self.purchase_date,
+            'owner_car_names': owner_car_names
+        }
