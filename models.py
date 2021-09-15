@@ -28,7 +28,7 @@ def setup_db(app,database_path=database_path):
     db.init_app(app)
 
 '''
-Modle_Owner : class is define many to many relationship
+Model_Owner : class is define many to many relationship
 between Car_Model and Car_Owner
 '''
 
@@ -61,7 +61,7 @@ class Car_Model(db.Model):
     id = Column(Integer, primary_key = True)
     model_name = Column(String)
     launch_date = Column(Date)
-    modle_owners = db.relationship('Model_Owner', cascade="all,delete", backref="models", lazy=True)
+    model_owners = db.relationship('Model_Owner', cascade="all,delete", backref="models", lazy=True)
 
     def __init__(self, model_name, launch_date):
         self.model_name =  model_name
@@ -100,12 +100,12 @@ class Car_Owner(db.Model):
 
     id = Column(Integer, primary_key=True)
     owner_name = Column(String)
-    purchase_date = Column(Date)
-    modle_owners = db.relationship("Modle_Owner", cascade = "all,delete", lazy=True)
+    address = Column(String)
+    model_owners = db.relationship("Model_Owner", cascade = "all,delete", lazy=True)
 
-    def __init__(self, owner_name, purchase_date):
+    def __init__(self, owner_name, address):
         self.owner_name = owner_name
-        self.purchase_date = purchase_date
+        self.address = address
 
     def insert(self):
         db.session.add(self)
@@ -119,14 +119,15 @@ class Car_Owner(db.Model):
         db.session.commit()
 
     def format(self):
-        owner_cars = db.session.query(Car_Model.modle_name).filter(
+        owner_car_names = []
+        owner_cars = db.session.query(Car_Model.model_name).filter(
             Model_Owner.onwer_id == self.id ,
-            Model_Owner.model_id == Car_Model.id).oder_by(Car_Model.id).all()
-        owner_car_names = [car.name for car in owner_cars]
+            Model_Owner.model_id == Car_Model.id).order_by(Car_Model.id).all()
+        owner_car_names = [car.model_name for car in owner_cars]
 
         return {
             'id': self.id,
             'owner_name': self.owner_name,
-            'purchase_date': self.purchase_date,
+            'address': self.address,
             'owner_car_names': owner_car_names
         }
