@@ -1,9 +1,10 @@
 import csv
 
 '''
-Car_Data: class read model and owner csv file and return information in dictionary.
-write model and owner csv file using database information.
+Car_Data: class read model and owner csv file and return information
+in dictionary. Write model and owner csv file using database information.
 '''
+
 
 class Car_Data:
     def __init__(self, csv_name):
@@ -12,6 +13,7 @@ class Car_Data:
     '''
     read_model_csv: Read model csv return infromation into dictonary.
     '''
+
     def read_model_csv(self):
         with open(self.csv_name, mode='r') as csv_file:
             # Read CSV file
@@ -27,12 +29,12 @@ class Car_Data:
                     "launch_date": row["launch_date"]
                 })
                 line_count += 1
-            return model_data 
-
+            return model_data
 
     '''
     read_owner_csv: Read owner csv return infromation into dictonary.
     '''
+
     def read_owner_csv(self):
         with open(self.csv_name, mode='r') as csv_file:
             # Read CSV file
@@ -53,19 +55,26 @@ class Car_Data:
     '''
     write_model_csv: Write model csv from database information.
     '''
+
     def write_model_csv(self, model_data):
         with open(self.csv_name, mode='w') as model_file:
-            model_writer = csv.writer(model_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            model_writer = csv.writer(
+                model_file, delimiter=',', quotechar='"',
+                quoting=csv.QUOTE_MINIMAL)
             model_writer.writerow(['model_name', 'launch_date'])
             for model in model_data:
-                model_writer.writerow([model['model_name'],model['launch_date']])
+                model_writer.writerow(
+                    [model['model_name'], model['launch_date']])
 
     '''
     write_owner_csv: Write owner csv from database information.
     '''
+
     def write_owner_csv(self, owner_data):
         with open(self.csv_name, mode='w') as owner_file:
-            owner_writer = csv.writer(owner_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            owner_writer.writerow(['owner_name','address'])
+            owner_writer = csv.writer(
+                owner_file, delimiter=',', quotechar='"',
+                quoting=csv.QUOTE_MINIMAL)
+            owner_writer.writerow(['owner_name', 'address'])
             for owner in owner_data:
-                owner_writer.writerow([owner['owner_name'],owner['address']])   
+                owner_writer.writerow([owner['owner_name'], owner['address']])

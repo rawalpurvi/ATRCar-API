@@ -11,8 +11,10 @@ from models import setup_db, Model_Owner, Car_Model, Car_Owner
 from auth import AuthError, requires_auth
 from data_csv import Car_Data
 
+
 class ATRCarTestCase(unittest.TestCase):
     """ This class represents ATRCar test case """
+
     def setUp(self):
         """Define test variables and initialize app."""
         self.app = create_app()
@@ -40,11 +42,11 @@ class ATRCarTestCase(unittest.TestCase):
         }
 
         self.atrcar_director_jwt = {
-                    'Authorization': "Bearer $DIRECTOR_TOKEN"
-                    }
+            'Authorization': "Bearer $DIRECTOR_TOKEN"
+        }
         self.atrcar_manager_jwt = {
-                    'Authorization': "Bearer $MANAGER_TOKEN" 
-                    }
+            'Authorization': "Bearer $MANAGER_TOKEN"
+        }
 
     def tearDown(self):
         """Executed after reach test"""
@@ -110,7 +112,8 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
 
-    # Run test for Role base atrcar_manager doesn't have permission to add Model
+    # Run test for Role base atrcar_manager doesn't
+    # have permission to add Model
     def test_unauthorize_for_add_new_model(self):
         res = self.client().post('/models', json=self.new_model,
                                  headers=self.atrcar_manager_jwt)
@@ -123,7 +126,8 @@ class ATRCarTestCase(unittest.TestCase):
     # Run test to add Owner and Error occurs
 
     def test_add_new_owner(self):
-        res = self.client().post('/owners', json=self.new_owner, headers=self.atrcar_manager_jwt)
+        res = self.client().post('/owners', json=self.new_owner,
+                                 headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -131,7 +135,8 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertTrue(len(data['owner']))
 
     def test_405_if_owner_addition_not_allowed(self):
-        res = self.client().post('/owners/122', json=self.new_owner, headers=self.atrcar_manager_jwt)
+        res = self.client().post('/owners/122', json=self.new_owner,
+                                 headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 405)
@@ -142,7 +147,9 @@ class ATRCarTestCase(unittest.TestCase):
 
     def test_update_model_name(self):
         res = self.client().patch(
-            'models/8', json={'model_name': 'Honda City'}, headers=self.atrcar_director_jwt)
+            'models/8', json={'model_name': 'Honda City'},
+            headers=self.atrcar_director_jwt
+        )
         data = json.loads(res.data)
         model = Car_Model.query.filter(Car_Model.id == 8).one_or_none()
 
@@ -157,7 +164,7 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
-    
+
     # Run test to assign Models to the Owner
 
     def test_assign_models_to_owner(self):
@@ -183,7 +190,10 @@ class ATRCarTestCase(unittest.TestCase):
     # Run test to update Owner and Error occurs
 
     def test_update_owner_name(self):
-        res = self.client().patch('/owners/4', json={'owner_name': 'Purvi Rawal'}, headers=self.atrcar_manager_jwt)
+        res = self.client().patch(
+            '/owners/4', json={'owner_name': 'Purvi Rawal'},
+            headers=self.atrcar_manager_jwt
+        )
         data = json.loads(res.data)
         owner = Car_Owner.query.filter(Car_Owner.id == 4).one_or_none()
 
@@ -192,7 +202,9 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertEqual(owner.format()['owner_name'], 'Purvi Rawal')
 
     def test_400_for_failed_owner_update(self):
-        res = self.client().patch('owners/1000', json={'owner_name': 'Purvi Rawal'}, headers=self.atrcar_manager_jwt)
+        res = self.client().patch('owners/1000',
+                                  json={'owner_name': 'Purvi Rawal'},
+                                  headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
@@ -218,10 +230,12 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
 
-    # Run test for Role base atrcar manager doesn't have permission to delete model
+    # Run test for Role base atrcar manager doesn't
+    # have permission to delete model
 
     def test_unauthorize_for_delete_model(self):
-        res = self.client().delete('/models/3', headers=self.atrcar_manager_jwt)
+        res = self.client().delete('/models/3',
+                                   headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
@@ -240,16 +254,19 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertEqual(owner, None)
 
     def test_400_if_owner_does_not_exit(self):
-        res = self.client().delete('owners/4000', headers=self.atrcar_manager_jwt)
+        res = self.client().delete('owners/4000',
+                                   headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
 
-    # Run test for read model CSV file and store data into database and Error occurs
+    # Run test for read model CSV file and store data
+    # into database and Error occurs
 
     def test_read_model_csv_into_database(self):
-        res = self.client().get('model_csv_to_db/models.csv', headers=self.atrcar_director_jwt)
+        res = self.client().get('model_csv_to_db/models.csv',
+                                headers=self.atrcar_director_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -257,16 +274,19 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertTrue(len(data['car_models']))
 
     def test_404_if_model_csv_dose_not_exist(self):
-        res = self.client().get('models/model_csv_to_do', headers=self.atrcar_director_jwt)
+        res = self.client().get('models/model_csv_to_do',
+                                headers=self.atrcar_director_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
-     # Run test for read Owner CSV file and store data into database and Error occurs
+    # Run test for read Owner CSV file and store data
+    # into database and Error occurs
 
     def test_read_owner_csv_into_database(self):
-        res = self.client().get('owner_csv_to_db/owners.csv', headers=self.atrcar_manager_jwt)
+        res = self.client().get('owner_csv_to_db/owners.csv',
+                                headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -274,7 +294,8 @@ class ATRCarTestCase(unittest.TestCase):
         self.assertTrue(len(data['car_owners']))
 
     def test_404_if_owner_csv_dose_not_exist(self):
-        res = self.client().get('owners/owner_csv_to_db', headers=self.atrcar_manager_jwt)
+        res = self.client().get('owners/owner_csv_to_db',
+                                headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
@@ -283,16 +304,22 @@ class ATRCarTestCase(unittest.TestCase):
     # Run test for wirte Model CSV file from Database information
 
     def test_write_model_csv_from_database(self):
-        res = self.client().get('/db_to_model_csv/test_models.csv', headers=self.atrcar_director_jwt)
+        res = self.client().get('/db_to_model_csv/test_models.csv',
+                                headers=self.atrcar_director_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['message'], 'Model information from database store in test_models.csv')
+        self.assertEqual(
+            data['message'],
+            'Model information from database store in test_models.csv'
+        )
 
-    # Run test for Role base atrcar manager doesn't have permission to write csv for model information
+    # Run test for Role base atrcar manager doesn't have
+    # permission to write csv for model information
 
     def test_unauthorize_for_write_model_csv(self):
-        res = self.client().get('/db_to_model_csv/models.csv', headers=self.atrcar_manager_jwt)
+        res = self.client().get('/db_to_model_csv/models.csv',
+                                headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
@@ -302,12 +329,16 @@ class ATRCarTestCase(unittest.TestCase):
     # Run test for wirte Owner CSV file from Database information
 
     def test_write_owner_csv_from_database(self):
-        res = self.client().get('/db_to_owner_csv/test_owners.csv', headers=self.atrcar_manager_jwt)
+        res = self.client().get('/db_to_owner_csv/test_owners.csv',
+                                headers=self.atrcar_manager_jwt)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['message'], 'Owner information from database store in test_owners.csv')
-    
+        self.assertEqual(
+            data['message'],
+            'Owner information from database store in test_owners.csv'
+        )
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
