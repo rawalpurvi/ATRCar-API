@@ -63,25 +63,26 @@ def create_app(test_config=None):
         # Return owner information
         return jsonify({
             'success': True,
-            'models': car_owner
+            'owners': car_owner
         })
     
     '''
     add_model : insert new model info into database 
     '''
     @app.route('/models', methods=['POST'])
-    @requires_auth('post:models')
+    @requires_auth('post:model')
     def add_model(model):
         body = request.get_json()
         try:
             # insert new values into database
             model_name = body.get('model_name')
             launch_date = body.get('launch_date')
-            model_data = Car_Model(model_name=model_name, lauch_date = launch_date)
+            
+            model_data = Car_Model(model_name=model_name, launch_date=launch_date)
             model_data.insert()
-
+            
             # Retrive inserted value from database
-            new_model = Car_Model.query.oder_by(Car_Model.id.desc()).limit(1).first()
+            new_model = Car_Model.query.order_by(Car_Model.id.desc()).limit(1).first()
             new_model = new_model.format()
 
             return jsonify({
@@ -95,23 +96,23 @@ def create_app(test_config=None):
     add_owner : insert new owner info into database
     '''
     @app.route('/owners', methods=['POST'])
-    @requires_auth('post:owners')
+    @requires_auth('post:owner')
     def add_owner(owner):
         body = request.get_json()
         try:
             # insert new values into database
             owner_name = body.get('owner_name')
             address = body.get('address')
-            car_data = Car_Owner(owner_name=owner_name, address = address)
+            car_data = Car_Owner(owner_name=owner_name, address=address)
             car_data.insert()
 
             # Retrive inserted value from database
-            new_car = Car_Owner.query.oder_by(Car_Owner.id.desc()).limit(1).first()
-            new_car = new_car.format()
+            new_owner = Car_Owner.query.order_by(Car_Owner.id.desc()).limit(1).first()
+            new_owner = new_owner.format()
 
             return jsonify({
                 'success': True,
-                'model': new_car
+                'owner': new_owner
             })
         except BaseException:
             abort(422)
@@ -122,7 +123,7 @@ def create_app(test_config=None):
     for car models.
     '''
     @app.route('/models/<int:model_id>', methods=['PATCH'])
-    @requires_auth('patch:models')
+    @requires_auth('patch:model')
     def update_model(model, model_id):
         body = request.get_json()
         try:
@@ -150,6 +151,58 @@ def create_app(test_config=None):
 
         except BaseException:
             abort(400)
+    
+    '''
+    update_owner:
+    Create an endpoint to handle PATCH requests
+    for car owners.
+    '''
+    @app.route('/owners/<int:owner_id>', methods=['PATCH'])
+    @requires_auth('patch:owner')
+    def update_owner(owner, owner_id):
+        body = request.get_json()
+        
+        try:
+            owner_name = body.get("owner_name", None)
+            address = body.get("address", None)
+            model_ids = body.get("selected_models", None)
+
+            # Check models are already assigned
+            owner_models = Model_Owner.query.filter(
+                Model_Owner.owner_id == owner_id).all()
+
+            if owner_models:
+                for owner_model in owner_models:
+                    owner_model.delete()            
+ 
+            # Set updated movie id and actor id in movie_actor table
+            if model_ids:
+                for model_id in model_ids:
+                    model_owner = Model_Owner(
+                        model_id=model_id, owner_id=owner_id)
+                    model_owner.insert()
+
+            # Update Owner
+            owner = Car_Owner.query.filter(Car_Owner.id == owner_id).one_or_none()
+
+            if owner is None:
+                abort(404)
+
+            if owner_name:
+                owner.owner_name = owner_name
+            if address:
+                owner.address = address
+            
+            owner.update()
+            updated_owner = owner.format()
+
+            return jsonify({
+                'success': True,
+                'owner': [updated_owner]
+            })
+
+        except BaseException:
+            abort(400)
 
     '''
     delete_model:
@@ -157,15 +210,15 @@ def create_app(test_config=None):
     for models.   
     '''
     @app.route('/models/<int:model_id>', methods=['DELETE'])
-    @requires_auth('delete:models')
+    @requires_auth('delete:model')
     def delete_model(model, model_id):
-
+        
         try:
             # Delete Model
             model = Car_Model.query.filter(Car_Model.id == model_id).one_or_none()
             if model is None:
                 abort(404)
-
+            
             model.delete()
 
             return jsonify({
@@ -181,30 +234,32 @@ def create_app(test_config=None):
     Create an endpoint to hande DELETE requets for owners.
     '''
     @app.route('/owners/<int:owner_id>', methods=['DELETE'])
-    @requires_auth('delete:owners')
+    @requires_auth('delete:owner')
     def delete_owner(owner, owner_id):
-
+        
         # Delete Owner
         try:
             owner = Car_Owner.query.filter(Car_Owner.id == owner_id).one_or_none()
-            if owner is none:
+            if owner is None:
                 abort(404)
+                
             owner.delete()
 
             return jsonify({
                 'success': True,
-                'delete':onwer_id
+                'delete': owner_id
             })
+
         except BaseException:
             abort(400)
     
     '''
     model_csv_to_database: Store Model information from CSV file into Database.
     '''
-    @app.route('/model_csv_to_db',methods=['GET'])
-    @requires_auth('post:models')
-    def model_csv_to_database():
-        if os.path.exists('readCSV/models.csv'):
+    @app.route('/model_csv_to_db/<file_name>',methods=['GET'])
+    @requires_auth('post:model')
+    def model_csv_to_database(model, file_name):
+        if os.path.exists('readCSV/{}'.format(file_name)):
             try:
                 car_models = Car_Data('readCSV/models.csv')
                 models = car_models.read_model_csv()
@@ -223,14 +278,14 @@ def create_app(test_config=None):
     
 
     '''
-    owner_csv_to_database: Store Model information from CSV file into Database.
+    owner_csv_to_database: Store Owner information from CSV file into Database.
     '''
-    @app.route('/owner_csv_to_db',methods=['GET'])
-    @requires_auth('post:models')
-    def owner_csv_to_database():
-        if os.path.exists('readCSV/owners.csv'):
+    @app.route('/owner_csv_to_db/<file_name>',methods=['GET'])
+    @requires_auth('post:owner')
+    def owner_csv_to_database(owner, file_name):
+        if os.path.exists('readCSV/{}'.format(file_name)):
             try:
-                car_owners = Car_Data('readCSV/owners.csv')
+                car_owners = Car_Data('readCSV/{}'.format(file_name))
                 owners = car_owners.read_owner_csv()
                 if owners:
                     for owner in owners:
@@ -248,17 +303,18 @@ def create_app(test_config=None):
     '''
     database_to_model_csv: Store Model information from CSV file into Database.
     '''
-    @app.route('/db_to_model_csv',methods=['GET'])
-    def database_to_model_csv():
+    @app.route('/db_to_model_csv/<file_name>',methods=['GET'])
+    @requires_auth('post:model')
+    def database_to_model_csv(model, file_name):
         try:
             model_data = Car_Model.query.order_by(Car_Model.id).all()
             models = [model.format() for model in model_data]
             if models:
-                car_models = Car_Data('writeCSV/models.csv')
+                car_models = Car_Data('writeCSV/{}'.format(file_name))
                 car_models.write_model_csv(models)
                 return jsonify({
                     'success': True,
-                    'message': 'Model information from store in models.csv'
+                    'message': 'Model information from database store in {}'.format(file_name)
                 })
             else:
                 abort(404)
@@ -266,19 +322,20 @@ def create_app(test_config=None):
             abort(422)
     
     '''
-    database_to_model_csv: Store Model information from CSV file into Database.
+    database_to_model_csv: Store Owner information from CSV file into Database.
     '''
-    @app.route('/db_to_owner_csv',methods=['GET'])
-    def database_to_owner_csv():
+    @app.route('/db_to_owner_csv/<file_name>',methods=['GET'])
+    @requires_auth('post:owner')
+    def database_to_owner_csv(owner, file_name):
         try:
             owner_data = Car_Owner.query.order_by(Car_Owner.id).all()
             owners = [owner.format() for owner in owner_data]
             if owners:
-                car_owners = Car_Data('writeCSV/owners.csv')
+                car_owners = Car_Data('writeCSV/{}'.format(file_name))
                 car_owners.write_owner_csv(owners)
                 return jsonify({
                     'success': True,
-                    'message': 'Owner information from store in owners.csv'
+                    'message': 'Owner information from database store in {}'.format(file_name)
                 })
             else:
                 abort(404)

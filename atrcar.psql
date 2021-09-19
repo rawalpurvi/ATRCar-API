@@ -1,0 +1,293 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: purvirawal
+--
+
+CREATE TABLE public.alembic_version (
+    version_num character varying(32) NOT NULL
+);
+
+
+ALTER TABLE public.alembic_version OWNER TO purvirawal;
+
+--
+-- Name: model_owner; Type: TABLE; Schema: public; Owner: purvirawal
+--
+
+CREATE TABLE public.model_owner (
+    id integer NOT NULL,
+    model_id integer NOT NULL,
+    owner_id integer NOT NULL
+);
+
+
+ALTER TABLE public.model_owner OWNER TO purvirawal;
+
+--
+-- Name: model_owner_id_seq; Type: SEQUENCE; Schema: public; Owner: purvirawal
+--
+
+CREATE SEQUENCE public.model_owner_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.model_owner_id_seq OWNER TO purvirawal;
+
+--
+-- Name: model_owner_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: purvirawal
+--
+
+ALTER SEQUENCE public.model_owner_id_seq OWNED BY public.model_owner.id;
+
+
+--
+-- Name: models; Type: TABLE; Schema: public; Owner: purvirawal
+--
+
+CREATE TABLE public.models (
+    id integer NOT NULL,
+    model_name character varying,
+    launch_date date
+);
+
+
+ALTER TABLE public.models OWNER TO purvirawal;
+
+--
+-- Name: models_id_seq; Type: SEQUENCE; Schema: public; Owner: purvirawal
+--
+
+CREATE SEQUENCE public.models_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.models_id_seq OWNER TO purvirawal;
+
+--
+-- Name: models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: purvirawal
+--
+
+ALTER SEQUENCE public.models_id_seq OWNED BY public.models.id;
+
+
+--
+-- Name: owners; Type: TABLE; Schema: public; Owner: purvirawal
+--
+
+CREATE TABLE public.owners (
+    id integer NOT NULL,
+    owner_name character varying,
+    address character varying
+);
+
+
+ALTER TABLE public.owners OWNER TO purvirawal;
+
+--
+-- Name: owners_id_seq; Type: SEQUENCE; Schema: public; Owner: purvirawal
+--
+
+CREATE SEQUENCE public.owners_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.owners_id_seq OWNER TO purvirawal;
+
+--
+-- Name: owners_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: purvirawal
+--
+
+ALTER SEQUENCE public.owners_id_seq OWNED BY public.owners.id;
+
+
+--
+-- Name: model_owner id; Type: DEFAULT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.model_owner ALTER COLUMN id SET DEFAULT nextval('public.model_owner_id_seq'::regclass);
+
+
+--
+-- Name: models id; Type: DEFAULT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.models ALTER COLUMN id SET DEFAULT nextval('public.models_id_seq'::regclass);
+
+
+--
+-- Name: owners id; Type: DEFAULT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.owners ALTER COLUMN id SET DEFAULT nextval('public.owners_id_seq'::regclass);
+
+
+--
+-- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: purvirawal
+--
+
+COPY public.alembic_version (version_num) FROM stdin;
+11f50a13fdbf
+\.
+
+
+--
+-- Data for Name: model_owner; Type: TABLE DATA; Schema: public; Owner: purvirawal
+--
+
+COPY public.model_owner (id, model_id, owner_id) FROM stdin;
+3	8	1
+4	9	1
+5	1	2
+6	2	2
+7	3	3
+8	5	3
+9	4	4
+10	6	4
+11	10	5
+12	12	5
+\.
+
+
+--
+-- Data for Name: models; Type: TABLE DATA; Schema: public; Owner: purvirawal
+--
+
+COPY public.models (id, model_name, launch_date) FROM stdin;
+1	Accord	2018-12-10
+2	City	2012-03-03
+3	Insight	2017-05-06
+4	Odyssey	2010-07-08
+5	Enix	2018-12-09
+6	Elysion	2021-04-08
+7	Accord	2018-12-10
+8	City	2012-03-03
+9	Insight	2017-05-06
+10	Odyssey	2010-07-08
+11	Enix	2018-12-09
+12	Elysion	2021-04-08
+\.
+
+
+--
+-- Data for Name: owners; Type: TABLE DATA; Schema: public; Owner: purvirawal
+--
+
+COPY public.owners (id, owner_name, address) FROM stdin;
+1	Purvi Rawal	2057 Elderberry Drive, San Ramon, 94582
+2	Tushar Rawal	2057 Elderberry Drive, San Ramon, 94582
+3	Aashi Rawal	39210 State St suite 205, Fremont, CA 94582
+4	Purvi Rawal	2057 Elderberry Drive, San Ramon, 94582
+5	Tushar Rawal	2057 Elderberry Drive, San Ramon, 94582
+6	Aashi Rawal	39210 State St suite 205, Fremont, CA 94582
+\.
+
+
+--
+-- Name: model_owner_id_seq; Type: SEQUENCE SET; Schema: public; Owner: purvirawal
+--
+
+SELECT pg_catalog.setval('public.model_owner_id_seq', 12, true);
+
+
+--
+-- Name: models_id_seq; Type: SEQUENCE SET; Schema: public; Owner: purvirawal
+--
+
+SELECT pg_catalog.setval('public.models_id_seq', 12, true);
+
+
+--
+-- Name: owners_id_seq; Type: SEQUENCE SET; Schema: public; Owner: purvirawal
+--
+
+SELECT pg_catalog.setval('public.owners_id_seq', 6, true);
+
+
+--
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.alembic_version
+    ADD CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num);
+
+
+--
+-- Name: model_owner model_owner_pkey; Type: CONSTRAINT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.model_owner
+    ADD CONSTRAINT model_owner_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: models models_pkey; Type: CONSTRAINT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.models
+    ADD CONSTRAINT models_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: owners owners_pkey; Type: CONSTRAINT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.owners
+    ADD CONSTRAINT owners_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: model_owner model_owner_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.model_owner
+    ADD CONSTRAINT model_owner_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.models(id) ON DELETE CASCADE;
+
+
+--
+-- Name: model_owner model_owner_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: purvirawal
+--
+
+ALTER TABLE ONLY public.model_owner
+    ADD CONSTRAINT model_owner_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.owners(id) ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

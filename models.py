@@ -37,7 +37,7 @@ class Model_Owner(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     model_id = db.Column(db.Integer, db.ForeignKey('models.id', ondelete="CASCADE"), nullable=False)
-    onwer_id = db.Column(db.Integer, db.ForeignKey('owners.id', ondelete="CASCADE"), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('owners.id', ondelete="CASCADE"), nullable=False)
 
     def __init__(self, model_id, owner_id):
         self.model_id = model_id
@@ -61,7 +61,7 @@ class Car_Model(db.Model):
     id = Column(Integer, primary_key = True)
     model_name = Column(String)
     launch_date = Column(Date)
-    model_owners = db.relationship('Model_Owner', cascade="all,delete", backref="models", lazy=True)
+    model_owners = db.relationship('Model_Owner', cascade="all, delete", backref='models', lazy=True)
 
     def __init__(self, model_name, launch_date):
         self.model_name =  model_name
@@ -73,7 +73,7 @@ class Car_Model(db.Model):
 
     def delete(self):
         db.session.delete(self)
-        db.sesion.commit()
+        db.session.commit()
     
     def update(self):
         db.session.commit()
@@ -101,7 +101,7 @@ class Car_Owner(db.Model):
     id = Column(Integer, primary_key=True)
     owner_name = Column(String)
     address = Column(String)
-    model_owners = db.relationship("Model_Owner", cascade = "all,delete", lazy=True)
+    model_owners = db.relationship("Model_Owner", cascade="all, delete", backref='owners', lazy=True)
 
     def __init__(self, owner_name, address):
         self.owner_name = owner_name
@@ -121,7 +121,7 @@ class Car_Owner(db.Model):
     def format(self):
         owner_car_names = []
         owner_cars = db.session.query(Car_Model.model_name).filter(
-            Model_Owner.onwer_id == self.id ,
+            Model_Owner.owner_id == self.id ,
             Model_Owner.model_id == Car_Model.id).order_by(Car_Model.id).all()
         owner_car_names = [car.model_name for car in owner_cars]
 

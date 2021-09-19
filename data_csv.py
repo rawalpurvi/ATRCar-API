@@ -20,7 +20,7 @@ class Car_Data:
             model_data = []
             for row in csv_reader:
                 if line_count == 0:
-                    print(f'Column names are {", ".join(row)}')
+                    print(f'Reading columns {", ".join(row)} from model csv.')
                     line_count += 1
                 model_data.append({
                     'model_name': row["model_name"],
@@ -41,7 +41,7 @@ class Car_Data:
             owner_data = []
             for row in csv_reader:
                 if line_count == 0:
-                    print(f'Column names are {", ".join(row)}')
+                    print(f'Reading Columns {", ".join(row)} from owner csv')
                     line_count += 1
                 owner_data.append({
                     'owner_name': row["owner_name"],
