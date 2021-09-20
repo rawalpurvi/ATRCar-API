@@ -148,7 +148,7 @@ The `--reload` flag will detect file changes and restart the server automaticall
     - Request Arguments: owner_id
     - Returns: An object owner with id, owner_name, adress, owner_car_names.
     - curl -X PATCH https://atrcar-api.herokuapp.com/owners/8 -H"Content-Type: application/json" -H "Authorization: Bearer $MANAGER_TOKEN"
-       -d "{\"owner_name\":\"Angie\"}"
+       -d '{"owner_name":"Angie"}'
     - {
         "owner":[
             {
@@ -223,7 +223,7 @@ The `--reload` flag will detect file changes and restart the server automaticall
     - Returns: An object owner with detais: id, owner_name, address, owner_car_names.
     - curl -X PATCH https://atrcar-api.herokuapp.com/owners/16 -H 
        "Content-Type: application/json" -H "Authorization: Bearer $DIRECTOR_TOKEN" 
-       -d "{\"selected_models\":[\"8\",\"9\"]}"
+       -d '{"selected_models":["8","9"]}'
     - {
         owners": [
           {
